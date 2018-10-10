@@ -1,6 +1,13 @@
 /**
  * RUBY MENU JQUERY PLUGIN
  * @plugin Menu
+ * 
+ * Biến $link định nghĩa cho {ns}link
+ * Biến $linkItem định nghĩa cho link <a>
+ * 
+ * @author        HaiBach
+ * @version       1.x
+ * @lastUpdate    10-10-2018
  */
 ;(function($) {
   'use strict';
@@ -21,22 +28,23 @@
      * OPTIONS DEFAULT
      */
     rm01VA.optsDefault = {
-      'isAutoInit' : true,
-      'isOffCanvas' : true,
-      'isBreadcrumb' : false,
+      isAutoInit : true,
+      isOffCanvas : true,
+      isBreadcrumb : false,
   
-      'name' : null,
-      'direction' : 'hor',
-      'textBack' : null,
-      'widthOffCanvas' : [0, 767],
-      'selectorToggle' : null, // Tim kiem button Toggle outside
-      'html' : {
-        'caret' : '<span class="{ns}caret"></span>',
-        'toggle' : '<a class="{ns}btn-toggle"><span></span><span></span><span></span></a>',
-        'back' : '<li class="{ns}list {ns}listback"><a class="{ns}linkback"><span class="{ns}arrowback">&lsaquo;</span></a></li>',
-        'breadcrumb' : '<div class="{ns}breadcrumb"></div>',
-        'breadcrumbHome' : '<a class="{ns}breadcrumb-item {ns}breadcrumb-home">Home</a>',
-        'breadcrumbItem' : '<a class="{ns}breadcrumb-item"></a>'
+      name : null,
+      direction : 'hor',
+      textBack : null,
+      widthOffCanvas : [0, 767],
+      selectorToggle : null, // Tim kiem button Toggle outside
+      html : {
+        caret : '<span class="{ns}caret"></span>',
+        toggle : '<a class="{ns}btn-toggle"><span></span><span></span><span></span></a>',
+        back : '<li class="{ns}list {ns}listback"><a class="{ns}linkback"><span class="{ns}arrowback">&lsaquo;</span></a></li>',
+        linkWrapper : '<div class="{ns}link"></div>',
+        breadcrumb : '<div class="{ns}breadcrumb"></div>',
+        breadcrumbHome : '<a class="{ns}breadcrumb-item {ns}breadcrumb-home">Home</a>',
+        breadcrumbItem : '<a class="{ns}breadcrumb-item"></a>'
       }
     };
   }
@@ -429,7 +437,16 @@
        * CHEN CAC THANH PHAN CAN THIET VAO MENU LUC BAN DAU
        */
       AddElements : function() {
-        console.log('add element');
+  
+        /**
+         * WRAPPER TAG <A> LINK
+         * Để layout css, event caret sẽ riêng biệt với đường link
+         */
+        var $linkItem = $ruby.find( M.NS('.{ns}list > a') );
+        $linkItem.wrap( M.NS(o.html.linkWrapper) );
+        va.$link = $linkItem.closest( M.NS('.{ns}link') );
+  
+  
   
         /**
          * CHEN BUTTON BACK TREN SUB MENU
@@ -439,12 +456,13 @@
   
         $menuLv2.each(function() {
           var $menuCur = $(this);
-          var $linkNear = $menuCur.siblings('a');
+          var $linkNear = $menuCur.siblings( M.NS('.{ns}link') );
+          var $linkItemNear = $linkNear.find('a');
           var strLink = o.textBack;
   
           // Noi dung cua Link back
           if( strLink == null ) {
-            strLink = $linkNear.length ? $linkNear.html() : '';
+            strLink = $linkItemNear.length ? $linkItemNear.html() : '';
           }
   
           // Chen them Link back vao Menu Lv3
@@ -459,10 +477,23 @@
   
   
         /**
-         * THEM THANH PHAN CARET CHO MENU LEVEL 2
+         * LINK TOGGLE + LINK CARET
+         * Thêm link caret vào sau link tag
+         * Tìm kiếm và setup link toggle
          */
-        va.$linkToggle = $ruby.find( M.NS('.{ns}menu .{ns}menu') ).siblings('a');
-        va.$linkToggle.append( M.NS(o.html.caret) );
+        var $link = $ruby.find( M.NS('.{ns}menu .{ns}menu') ).siblings( M.NS('.{ns}link') );
+        var $linkItem = $link.find('a');
+  
+        va.$linkToggle = $();
+        $linkItem.after( M.NS(o.html.caret) );
+        $linkItem.each(function() {
+          var $itemCur = $(this);
+          var linkHref = $itemCur.prop('href');
+          var $caret = $itemCur.next( M.NS('.{ns}caret') );
+          var $toggleCur = (/^#/.test(linkHref) || !linkHref) ? $itemCur : $caret;
+          // Lưu trữ link toggle
+          va.$linkToggle = va.$linkToggle.add($toggleCur);
+        });
   
   
   
@@ -663,7 +694,8 @@
          * REGISTER 'TAP' EVENT ON LINK-TOGGLE
          */
         va.$linkToggle.on(tapEvName, function() {
-          API.openMenu( $(this) );
+          var $link = $(this).closest( M.NS('.{ns}link') );
+          API.openMenu( $link );
         });
   
   
@@ -674,7 +706,7 @@
         va.$linkBack.on(tapEvName, function() {
   
           // Search link-parent of link-back
-          var $linkParent = $(this).closest( M.NS('.{ns}menu') ).siblings('a');
+          var $linkParent = $(this).closest( M.NS('.{ns}menu') ).siblings( M.NS('.{ns}link') );
   
           // API close the child menu
           API.closeMenu($linkParent);
@@ -741,7 +773,14 @@
       },
   
       /**
-       * THE 'DRAWER' EFFECT - FOR MENU VERTICAL & MOBILE
+       * HIỆU ỨNG DRAWER - NGĂN KÉO TRÊN SP
+       * 
+       * + MenuGhost dùng để thực hiện hiệu ứng In. Sử dụng MenuGhost sẽ dễ dàng setup hiệu ứng In/Out hơn so với thuộc tính 'transition'
+       * + Timeout được setup để loại bỏ MenuGhost và thêm/loại bỏ class sau cùng
+       * + Duration Timeout sẽ được lấy từ 'animation-duration' css của MenuCur và MenuGhost
+       * 
+       * + Khi fx-open: MenuGhost sẽ copy menuOpenCur để thực hiện hiệu ứng In. MenuCurrent sẽ thực hiện hiệu ứng Out.
+       * + Khi fx-closed: MenuGhost sẽ copy menuParent để thực hiện hiệu ứng In. MenuCurrent thực hiện hiệu ứng Out.
        */
       Drawer : function($linkCur) {
         var $listParent = $linkCur.closest( M.NS('.{ns}list') );
@@ -819,8 +858,7 @@
           va.tiFxDrawer = setTimeout(function() {
   
             // Them - Loai bo class 'Open' tren Menu parent
-            $menuParent.add($listParent)
-              [isOpen ? 'addClass' : 'removeClass'](classOpen);
+            $menuParent.add($listParent)[ isOpen ? 'addClass' : 'removeClass' ](classOpen);
   
             // Loai bo doi tuong Menu ghost
             $menuGhost.remove();
@@ -830,6 +868,49 @@
           }, va.speedCur - 10);
         }
   
+  
+  
+        /**
+         * RUN FUNCTION
+         */
+        $listParent.length && Toggle();
+      },
+      Drawer1 : function($linkCur) {
+        var $listParent = $linkCur.closest( M.NS('.{ns}list') );
+        var $menuParent = $linkCur.closest( M.NS('.{ns}menu') );
+        var ns = va.ns;
+        var classOpen = ns + 'open';
+  
+  
+        /**
+         * FUNCTION TOGGLE EFFECT OPEN - CLOSE MENU
+         */
+        function Toggle() {
+  
+          // Automatically recognizes the current status
+          var isOpen = !$listParent.hasClass(classOpen);
+  
+          /**
+           * SETUP NHUNG BIEN PHAN BIET BOI 'STATUS'
+           */
+          if( isOpen ) {
+  
+            // Add the list & menu open to global variable
+            va.$menuOpenCur = $linkCur.siblings( M.NS('.{ns}menu') );
+            va.$listOpen = va.$listOpen.add($listParent).add($menuParent);
+          }
+          else {
+  
+            // Store the current menu-open
+            va.$menuOpenCur = $menuParent;
+  
+            // Remove list & menu close out global variable
+            va.$listOpen = va.$listOpen.not($listParent).not($menuParent);
+          }
+  
+          // Them - Loai bo class 'Open' tren Menu parent
+          $menuParent.add($listParent)[ isOpen ? 'addClass' : 'removeClass' ](classOpen);
+        }
   
   
         /**
@@ -923,8 +1004,8 @@
       // The parent menu open child menu
       openMenu : function($link) {
   
-        // Conditional execution
-        if( !($link && $link.length && va.$linkToggle.is($link)) ) return;
+        // Conditional execution -> Ko phù hợp nữa
+        // if( !($link && $link.length && va.$linkToggle.is($link)) ) return;
   
         // Continue setup
         var $listParent = $link.closest( M.NS('.{ns}list') );
@@ -944,8 +1025,8 @@
       closeMenu : function($link) {
   
         // Conditional execution
-        if( !($link && $link.length && va.$linkToggle.is($link)) ) return;
-  
+        // if( !($link && $link.length && va.$linkToggle.is($link)) ) return;
+        
         // Continue setup
         FX.Drawer($link);
       },

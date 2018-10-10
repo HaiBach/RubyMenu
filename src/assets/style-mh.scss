@@ -1,0 +1,429 @@
+/**
+ * NAVIGATION
+ */
+ $fx-duration: .2s;
+
+ /** NAVIGATION HEADER **/
+ .nav-header-wrap {
+ 
+   /** MENU SP **/
+   @media (max-width: $lg-991) {
+     align-self: center;
+     z-index: 100;
+ 
+     .rm01 {
+       overflow: hidden;
+       position: absolute;
+       top: 100%;
+       left: 0;
+       width: 100vw;
+       height: 0; // Hide Nav Menu
+       background-color: $color-white;
+       > .rm01menu {
+         display: block;
+         margin-bottom: 0;
+         > .rm01list {
+           a {
+             display: block;
+             padding: 15px 0;
+             margin-left: 50px;
+             margin-right: 50px;
+             color: $color-black;
+             border-bottom: 1px solid #ddd;
+           }
+         }
+         // Fixed Hien thi icon 'Home' tren Menu
+         .icon-home3 a span:first-child {
+           display: none;
+         }
+         .rm01menu {
+           position: absolute;
+           top: 0;
+           left: 0;
+           display: none;
+           width: 100%;
+           padding-top: 10px;
+         }
+       }
+       .rm01list {
+         display: block;
+       }
+       .rm01link {
+         position: relative;
+         transition: transform 0.4s, opacity 0.4s;
+         transform: translateY(200%);
+         opacity: 0;
+       }
+       .rm01caret {
+         position: absolute;
+         right: 0;
+         top: 5px;
+         width: 60px;
+         height: 40px;
+         margin-right: 50px;
+         border-left: 1px dashed #aaa;
+         text-align: center;
+         z-index: 99;
+         &::before {
+           content: '\00BB';
+           font-size: 2rem;
+           line-height: 40px;
+         }
+       }
+       .rm01listback {
+         background-color: #f5f5f5;
+         font-weight: bold;
+         a.rm01linkback {
+           border-bottom: none;
+         }
+         .rm01arrowback {
+           padding-right: 10px;
+           font-size: 1.8rem;
+         }
+       }
+       
+       /* Menu Push */
+       &.rm01push {
+         overflow: visible;
+         height: auto; // Show Nav menu
+         padding-top: 10px;
+         padding-bottom: 30px;
+         margin-top: -40px;
+         > .rm01menu {
+           > .rm01list {
+             .rm01link {
+               transform: translateY(0);
+               opacity: 1;
+             }
+             &:nth-child(1) .rm01link {
+               transition-delay: 0s;
+             }
+             &:nth-child(2) .rm01link {
+               transition-delay: 0.05s;
+             }
+             &:nth-child(3) .rm01link {
+               transition-delay: 0.1s;
+             }
+             &:nth-child(4) .rm01link {
+               transition-delay: 0.15s;
+             }
+             &:nth-child(5) .rm01link {
+               transition-delay: 0.2s;
+             }
+             &:nth-child(6) .rm01link {
+               transition-delay: 0.25s;
+             }
+             &:nth-child(7) .rm01link {
+               transition-delay: 0.3s;
+             }
+             &:nth-child(8) .rm01link {
+               transition-delay: 0.35s;
+             }
+             &:nth-child(9) .rm01link {
+               transition-delay: 0.4s;
+             }
+             &:nth-child(10) .rm01link {
+               transition-delay: 0.45s;
+             }
+           }
+         }
+       }
+ 
+       /* Menu Open */
+       .rm01menu {
+         &.rm01open {
+           > .rm01list {
+             display: none;
+             &.rm01open {
+               display: block;
+               > .rm01link {
+                 display: none;
+               }
+               > .rm01menu {
+                 display: block;
+               }
+             }
+           }
+         }
+         &.rm01fx-open {
+           animation: rm01open-slideOut $fx-duration;
+         }
+         &.rm01fx-closed {
+           animation: rm01closed-slideOut $fx-duration;
+         }
+       }
+       /* Menu Ghost */
+       .rm01ghost {
+         position: absolute;
+         left: 0;
+         top: 10px;
+         width: 100%;
+         /* Retore style menu */
+         > .rm01list {
+           a {
+             transform: translateY(0);
+             opacity: 1;
+           }
+         }
+         &.rm01fx-open {
+           animation: rm01open-slideIn $fx-duration;
+         }
+         &.rm01fx-closed {
+           animation: rm01closed-slideIn $fx-duration;
+         }
+       }
+     }
+   }
+ 
+   /** MENU PC **/
+   @media (min-width: $lg) {
+     overflow: hidden;
+     align-self: center;
+     padding: 6px;
+     &:hover {
+       overflow: visible;
+     }
+     .nav-header {
+       > ul.menu {
+         display: flex;
+         margin-bottom: 0;
+         background-color: rgba(255, 255, 255, 0.7);
+         @include borderline-out(block);
+         > .menu-item {
+           position: relative;
+           display: block;
+           > .rm01link {
+             text-align: center;
+           }
+         }
+         .menu-item {
+           /* Menu actived */
+           &.current-menu-item,
+           &.current-menu-parent,
+           &.current-category-ancestor,
+           &.current-page-ancestor,
+           &.current_page_parent {
+             > .rm01link {
+               &, &:hover {
+                 background-color: $color-primary;
+                 a {
+                   color: $color-white;
+                 }
+                 .rm01caret {
+                   color: $color-white;
+                   &::before {
+                     content: '\25B4';
+                   }
+                 }
+                 &:before, &:after {
+                   display: block;
+                 }
+               }
+             }
+           }
+         }
+         .rm01link {
+           min-width: 60px;
+           padding-left: 12px;
+           padding-right: 12px;
+           cursor: pointer;
+           @include borderline-out(none);
+           a {
+             position: relative; // Fixed z-index
+             display: inline-block;
+             min-height: 42px;
+             line-height: 42px;
+             color: $color-primary;
+             text-decoration: none;
+             z-index: 3;
+           }
+           .rm01caret {
+             display: inline-block;
+             padding-left: 5px;
+             color: $color-primary;
+             &::before {
+               content: '\25BE';
+             }
+           }
+ 
+           &:hover {
+             background-color: rgba($color: $color-primary, $alpha: 0.25);
+             &:before, &:after {
+               display: block;
+             }
+           }
+         }
+         
+         // Fixed Hien thi icon 'Home' tren Menu
+         .icon-home3 a span {
+           &:first-child {
+             font-size: 1.6rem;
+             line-height: 1.4;
+             vertical-align: middle;
+           }
+           &:last-child {
+             display: none;
+           }
+         }
+       }
+ 
+       /* Submenu */
+       .sub-menu {
+         @include borderline-out();
+         position: absolute;
+         left: 0;
+         top: 100%;
+         display: flex;
+         flex-wrap: wrap;
+         min-width: 350px;
+         margin-top: 6px;
+         background-color: $color-white;
+         transition: all 0.4s;
+         transform: translateY(10px);
+         opacity: 0;
+         > .menu-item {
+           position: relative;
+           display: block;
+           width: 50%;
+         }
+       }
+       .rm01listback {
+         display: none;
+       }
+       .rm01link:hover + .sub-menu,
+       .sub-menu:hover {
+         transform: translateY(0);
+         opacity: 1;
+         z-index: 3;
+       }
+     }
+   }
+ }
+ 
+ /** RubyMenu Effect **/
+ @keyframes rm01open-slideOut {
+   to {
+     transform: translateX(-100%);
+   }
+ }
+ @keyframes rm01open-slideIn {
+   from {
+     transform: translateX(100%);
+   }
+ }
+ @keyframes rm01closed-slideOut {
+   to {
+     transform: translateX(100%);
+   }
+ }
+ @keyframes rm01closed-slideIn {
+   from {
+     transform: translateX(-100%);
+   }
+ }
+ 
+ 
+ /** MENU OVERLAY **/
+ html {
+   body {
+     &:before {
+       content: '';
+       position: absolute;
+       background: #fff;
+       opacity: 0;
+       z-index: 99;
+       transition: opacity 0.2s;
+     }
+   }
+   &.rm01push {
+     body {
+       position: relative;
+       overflow: hidden;
+       &:before {
+         width: 100%;
+         height: 100%;
+         opacity: 1;
+       }
+     }
+   }
+ }
+ 
+ /** NAV MENU TOGGLE **/
+ .nav-header-toggle {
+   width: 50px;
+   height: 50px;
+   z-index: 101;
+   .border-inner {
+     height: 100%;
+     padding: 13px 8px;
+     background-color: rgba(255,255,255,0.5);
+   }
+   // Animate Borderline
+   &.borderline-in {
+     &.rm01push {
+       &::before {
+         transform: translate(0, 10px);
+         // transform: translate(-10px, 0);
+       }
+       &::after {
+         transform: translate(0, -10px);
+         // transform: translate(10px, 0);
+       }
+       .border-inner {
+         &::before {
+           transform: translate(10px, 0);
+           // transform: translate(0, -10px);
+         }
+         &::after {
+           transform: translate(-10px, 0);
+           // transform: translate(0, 10px);
+         }
+       }
+     }
+   }
+ 
+   // Style Three line
+   a {
+     position: relative;
+     display: block;
+     height: 100%;
+     &::before, &::after, span {
+       content: '';
+       position: absolute;
+       width: 100%;
+       left: 0;
+       height: 2px;
+       background-color: $color-primary;
+       transition: transform 0.2s, opacity 0.2s;
+     }
+     &::before {
+       top: 0;
+     }
+     &::after {
+       bottom: 0;
+     }
+     span {
+       top: 50%;
+       margin-top: -1px;
+     }
+   }
+   // Animate Three line
+   &.rm01push {
+     a {
+       &::before {
+         transform: translateY(6px) rotate(45deg);
+       }
+       &::after {
+         transform: translateY(-6px) rotate(-45deg);
+       }
+       span {
+         transform: translateX(-200%);
+         opacity: 0;
+       }
+     }
+   }
+ 
+   @media (min-width: $lg) {
+     display: none;
+   }
+ }
