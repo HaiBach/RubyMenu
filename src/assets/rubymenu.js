@@ -5,7 +5,7 @@
  * Biến $link định nghĩa cho {ns}link
  * Biến $linkItem định nghĩa cho link <a>
  * 
- * @author        HaiBach
+ * @author        HaiBach / Nguyen Van Thy
  * @version       1.x
  * @lastUpdate    10-10-2018
  */
