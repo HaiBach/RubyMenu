@@ -5,10 +5,11 @@
  * Biến $link định nghĩa cho {ns}link
  * Biến $linkItem định nghĩa cho link <a>
  * 
- * @author        HaiBach / Nguyen Van Thy
- * @version       1.x
- * @lastUpdate    10-10-2018
+ * @author        HaiBach / Nguyễn Văn Thy
+ * @version       1.1
+ * @lastUpdate    14-Jul-2022
  */
+
 ;(function($) {
   'use strict';
   
@@ -485,7 +486,7 @@
         var $linkItem = $link.find('a');
   
         va.$linkToggle = $();
-        $linkItem.after( M.NS(o.html.caret) );
+        $linkItem.append( M.NS(o.html.caret) );
         $linkItem.each(function() {
           var $itemCur = $(this);
           var linkHref = $itemCur.prop('href');
